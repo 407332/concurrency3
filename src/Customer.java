@@ -1,8 +1,6 @@
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import messages.Available;
-import messages.Bought;
-import messages.NotAvailable;
+import messages.*;
 
 public class Customer extends AbstractActor {
 

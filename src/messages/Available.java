@@ -1,4 +1,4 @@
 package messages;
 
-public class Available {
+public final class Available {
 }

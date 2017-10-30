@@ -1,4 +1,4 @@
 package messages;
 
-public class Cancel {
+public final class Cancel {
 }

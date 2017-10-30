@@ -1,4 +1,4 @@
 package messages;
 
-public class NotAvailable {
+public final class NotAvailable {
 }
