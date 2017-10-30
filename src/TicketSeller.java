@@ -24,10 +24,10 @@ public class TicketSeller extends AbstractActor {
                 .match(Buy.class, msg -> {
 
                 })
-                .match(Available.class, msg -> {
+                .match(String.class, msg -> msg.equals("Available"),msg -> {
 
                 })
-                .match(NotAvailable.class, msg -> {
+                .match(String.class, msg -> msg.equals("NotAvailable"),msg -> {
 
                 })
                 .match(Cancel.class, msg -> {

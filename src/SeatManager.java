@@ -33,6 +33,11 @@ public class SeatManager extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(IsAvailable.class, msg -> {
+                    if (seatsavailable > msg.getNumberofseats()){
+                        ticketseller.tell("Available", getSelf());
+                    }else{
+                        ticketseller.tell("NotAvailable", getSelf());
+                    }
 
                 })
                 .match(Reserve.class, msg -> {
