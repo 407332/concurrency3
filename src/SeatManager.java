@@ -3,70 +3,70 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import messages.*;
 
+import java.util.ArrayList;
+
 public class SeatManager extends AbstractActor {
 
     private int section;
-    private int numberOfSeats;
-    private int seatsavailable;
+    private ArrayList<Seat> seats = new ArrayList<>();
     private ActorRef ticketseller;
 
-    private SeatManager(int section, int numberOfSeats, ActorRef ticketseller){
+    private SeatManager(int section, ActorRef ticketseller){
         this.section = section;
-        this.numberOfSeats = numberOfSeats;
-        seatsavailable = numberOfSeats;
         this.ticketseller = ticketseller;
 
     }
 
-    public static Props prop(int section, int seats, ActorRef ref ) {
-        return Props.create(SeatManager.class, section, seats, ref);
+    public static Props prop(int section, ActorRef ref ) {
+        return Props.create(SeatManager.class, section, ref);
     }
-    public void preStart(){
-        System.out.println("Seatmanager created");
-    }
-
-    public void postStop(){
-        System.out.println("Seatmanager removed");
-    }
-
 
     public Receive createReceive() {
         return receiveBuilder()
                 .match(IsAvailable.class, msg -> {
-                    if (seatsavailable > msg.getNumberofseats()){
-                        ticketseller.tell("Available", getSelf());
+                    if (seats.size() > msg.getNumberofseats()){
+                        System.out.println("I have available seats");
+                        ActorRef customer = msg.getCustomer();
+                        Available message = new Available(customer);
+
+                        ticketseller.tell(message, getSelf());
+
                     }else{
-                        ticketseller.tell("NotAvailable", getSelf());
+                        System.out.println("I don't have any space for you");
+                        ActorRef customer = msg.getCustomer();
+                        NotAvailable message = new NotAvailable(customer);
+                        ticketseller.tell(message, getSelf());
                     }
 
                 })
-                .match(Reserve.class, msg -> {
+                .match(Bought.class, msg -> {
+                    System.out.println("Allright the seats are reserved");
 
                 })
                 .match(Cancel.class, msg -> {
+                    System.out.println("Allright I'll remove the reservation");
 
                 })
                 .build();
     }
 
-    public int getSection() {
-        int var = section;
-        return var;
+    public void preStart(){
+        addSeats();
     }
 
-    public int getNumberOfSeats() {
-        int var = numberOfSeats;
-        return var;
+    public void addSeats(){
+        for (int i=0; i < 40; i++){
+            Seat seat = new Seat(section,i);
+            seats.add(seat);
+        }
     }
 
-    public int getSeatsavailable() {
-        int var = seatsavailable;
-        return var;
-    }
+    public void reserve(int n) {
+        int q = 0;
+        while (q < n)
+            for (int i = 0; i < seats.size(); i++) {
 
-    public ActorRef getTicketseller() {
-        ActorRef var = ticketseller;
-        return var;
+            }
     }
 }
 
