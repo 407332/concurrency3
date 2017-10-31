@@ -12,18 +12,15 @@ public class Seat {
     }
 
     public int getSection() {
-        int var = section;
-        return var;
+        return section;
     }
 
     public int getSeatNumber() {
-        int var = seatNumber;
-        return var;
+        return seatNumber;
     }
 
     public ActorRef getOwner() {
-        ActorRef var = owner;
-        return var;
+        return owner;
     }
 
     public void setOwner(ActorRef owner) {

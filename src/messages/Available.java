@@ -10,7 +10,6 @@ public final class Available {
     }
 
     public ActorRef getCustomer(){
-        ActorRef var = customer;
-        return var;
+        return customer;
     }
 }

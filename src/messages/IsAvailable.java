@@ -12,12 +12,10 @@ public final class IsAvailable {
     }
 
     public int getNumberofseats(){
-        int var = numberofseats;
-        return var;
+        return numberofseats;
     }
 
     public ActorRef getCustomer(){
-        ActorRef var = customer;
-        return var;
+        return customer;
     }
 }

@@ -15,17 +15,14 @@ public final class Cancel {
     }
 
     public int getSection() {
-        int var = section;
-        return var;
+        return section;
     }
 
     public int getNumberofseats() {
-        int var = numberofseats;
-        return var;
+        return numberofseats;
     }
 
     public ActorRef getCustomer() {
-        ActorRef var = customer;
-        return var;
+        return customer;
     }
 }
