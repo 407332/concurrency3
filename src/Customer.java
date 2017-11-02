@@ -2,11 +2,15 @@ import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import messages.*;
+import java.util.Random;
+
+import java.util.ArrayList;
 
 public class Customer extends AbstractActor {
 
-    private int section = 1;
-    private int numberofseats = 2;
+    private Random random = new Random();
+    private int section = random.nextInt(7)+1;
+    private int numberofseats = random.nextInt(4)+1;
     private ActorRef ticketseller;
 
     private Customer(ActorRef ticketseller){
@@ -20,15 +24,26 @@ public class Customer extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(Available.class, msg -> {
-                    Bought message = new Bought(section,numberofseats,ticketseller);
+                    Buy message = new Buy(section,numberofseats,getSelf());
                     ticketseller.tell(message, getSelf());
                     System.out.println("I want to buy "+ numberofseats + " please.");
                 })
                 .match(NotAvailable.class, msg -> {
-                    System.out.println("Owh well to bad.");
+                    System.out.println("Owh well too bad.");
                 })
-                .match(Bought.class, msg -> {
-                    System.out.println("Awesome!");
+                .match(Reservation.class, msg -> {
+                    System.out.println(msg.getSeats());
+                    int i = random.nextInt(10)+1;
+                    if (i>8){
+                        System.out.println("I don't want my tickets anymore");
+                        Cancel cancel = new Cancel(section, numberofseats, getSelf());
+                        ticketseller.tell(cancel, getSelf());
+                    }
+                    section = random.nextInt(7)+1;
+                    numberofseats = random.nextInt(4)+1;
+                    Reserve message = new Reserve(section,numberofseats,getSelf());
+                    ticketseller.tell(message, getSelf());
+                    System.out.println("I want "+ numberofseats + " tickets in section " + section + " please.");
 
                 })
                 .build();
@@ -39,7 +54,6 @@ public class Customer extends AbstractActor {
         Reserve message = new Reserve(section,numberofseats,getSelf());
         ticketseller.tell(message, getSelf());
         System.out.println("I want "+ numberofseats + " tickets in section " + section + " please.");
-
     }
 
     public void postStop(){

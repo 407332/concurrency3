@@ -30,21 +30,31 @@ public class TicketBureau extends AbstractActor {
                     NotAvailable message = new NotAvailable(customer);
                     customer.tell(message, getSelf());
                 })
-                .match(Bought.class, msg -> {
+                .match(Buy.class, msg -> {
                     System.out.println("Allright you can pay here");
                     int i = random.nextInt(10)+1;
-                    if (i<9){
+                    if (i<12){
                         System.out.println("Succesfull Payment");
                         ActorRef seatManager = seatManagers.get(msg.getSection()-1);
                         seatManager.tell(msg, getSelf());
                     }else{
                         System.out.println("Payment failed");
                         getSender().tell("Failed", getSelf());
+                        ActorRef seatManager = seatManagers.get(msg.getSection()-1);
+                        Cancel cancel = new Cancel(msg.getSection(),msg.getNumberofseats(),msg.getCustomer());
+                        seatManager.tell(cancel,getSelf());
                     }
+                })
+                .match(Reservation.class, msg -> {
 
+                    Reservation message = new Reservation(msg.getSeats(),msg.getCustomer());
+                    msg.getCustomer().tell(message, getSelf());
                 })
                 .match(Cancel.class, msg -> {
-
+                    System.out.println("Allright we will cancel the tickets");
+                    Cancel cancel = new Cancel(msg.getSection(),msg.getNumberofseats(),msg.getCustomer());
+                    ActorRef seatManager = seatManagers.get(msg.getSection()-1);
+                    seatManager.tell(cancel,getSelf());
                 })
                 .match(String.class, msg -> msg.equals("Start"), msg ->{
                     generateSeatmanagers();
@@ -54,7 +64,7 @@ public class TicketBureau extends AbstractActor {
 
     private void generateSeatmanagers(){
         for (int i=0; i <= 6; i++){
-            ActorRef temp = getContext().actorOf(SeatManager.prop(i, getSelf()), "SM"+ i);
+            ActorRef temp = getContext().actorOf(SeatManager.prop(i+1));
             seatManagers.add(temp);
             System.out.println("Seatmanager "+ i + "created");
         }

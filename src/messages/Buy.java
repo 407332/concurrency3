@@ -2,12 +2,12 @@ package messages;
 
 import akka.actor.ActorRef;
 
-public final class Bought {
+public final class Buy {
     private int section;
     private int numberofseats;
     private ActorRef customer;
 
-    public Bought(int section, int numberofseats, ActorRef customer){
+    public Buy(int section, int numberofseats, ActorRef customer){
         this.section = section;
         this.numberofseats = numberofseats;
         this.customer = customer;
