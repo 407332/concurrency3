@@ -60,22 +60,12 @@ public class Ticketagent extends AbstractActor {
                     ActorRef seatManager = seatManagers.get(msg.getSection()-1);
                     seatManager.tell(cancel,getSelf());
                 })
-                .match(String.class, msg -> msg.equals("Start"), msg ->{
-                    generateSeatmanagers();
-                })
                 .matchAny(object ->{
                     System.out.println("Wrong Message");
                 })
                 .build();
     }
 
-    private void generateSeatmanagers(){
-        for (int i=0; i <= 6; i++){
-            ActorRef temp = getContext().actorOf(SeatManager.prop(i+1));
-            seatManagers.add(temp);
-            System.out.println("Seatmanager "+ i + "created");
-        }
-    }
 
     public void preStart(){
         System.out.println("Ticketseller created");
