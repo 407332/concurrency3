@@ -1,63 +1,41 @@
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.routing.ActorRefRoutee;
+import akka.routing.RoundRobinRoutingLogic;
+import akka.routing.Routee;
+import akka.routing.Router;
 import messages.*;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.List;
 
 public class TicketBureau extends AbstractActor {
 
+
     private ArrayList<ActorRef> seatManagers = new ArrayList<>();
-    private Random random = new Random();
+    private Router router;
+
+    {
+        generateSeatmanagers();
+        List<Routee> routees = new ArrayList<Routee>();
+        for (int i = 0; i < 4; i++) {
+            ActorRef temp = getContext().actorOf(Props.create(Ticketagent.class));
+            getContext().watch(temp);
+            routees.add(new ActorRefRoutee(temp));
+            SeatReferences msg = new SeatReferences(seatManagers);
+            temp.tell(msg,getSelf());
+        }
+        router = new Router(new RoundRobinRoutingLogic(), routees);
+    }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
                 .match(Reserve.class, msg -> {
-                    System.out.println("Let me see what i can do" + getSender());
-                    IsAvailable message = new IsAvailable(msg.getNumberofseats(), getSender());
-                    ActorRef seatManager = seatManagers.get(msg.getSection()-1);
-                    seatManager.tell(message, getSelf());
-
-                })
-                .match(Available.class, msg -> {
-                    ActorRef customer = msg.getCustomer();
-                    Available message = new Available(customer);
-                    customer.tell(message, getSelf());
-                })
-                .match(NotAvailable.class, msg -> {
-                    ActorRef customer = msg.getCustomer();
-                    NotAvailable message = new NotAvailable(customer);
-                    customer.tell(message, getSelf());
-                })
-                .match(Buy.class, msg -> {
-                    System.out.println("Allright you can pay here");
-                    int i = random.nextInt(10)+1;
-                    if (i<12){
-                        System.out.println("Succesfull Payment");
-                        ActorRef seatManager = seatManagers.get(msg.getSection()-1);
-                        seatManager.tell(msg, getSelf());
-                    }else{
-                        System.out.println("Payment failed");
-                        getSender().tell("Failed", getSelf());
-                        ActorRef seatManager = seatManagers.get(msg.getSection()-1);
-                        Cancel cancel = new Cancel(msg.getSection(),msg.getNumberofseats(),msg.getCustomer());
-                        seatManager.tell(cancel,getSelf());
-                    }
-                })
-                .match(Reservation.class, msg -> {
-
-                    Reservation message = new Reservation(msg.getSeats(),msg.getCustomer());
-                    msg.getCustomer().tell(message, getSelf());
-                })
-                .match(Cancel.class, msg -> {
-                    System.out.println("Allright we will cancel the tickets");
-                    Cancel cancel = new Cancel(msg.getSection(),msg.getNumberofseats(),msg.getCustomer());
-                    ActorRef seatManager = seatManagers.get(msg.getSection()-1);
-                    seatManager.tell(cancel,getSelf());
-                })
-                .match(String.class, msg -> msg.equals("Start"), msg ->{
-                    generateSeatmanagers();
+                    router.route(msg,getSender());
+                }).matchAny(object ->{
+                    System.out.println("Wrong Message");
                 })
                 .build();
     }
@@ -66,15 +44,15 @@ public class TicketBureau extends AbstractActor {
         for (int i=0; i <= 6; i++){
             ActorRef temp = getContext().actorOf(SeatManager.prop(i+1));
             seatManagers.add(temp);
-            System.out.println("Seatmanager "+ i + "created");
+            System.out.println("Seatmanager "+ (i+1) + "created");
         }
     }
 
     public void preStart(){
-        System.out.println("Ticketseller created");
+        System.out.println("Ticketbureau created");
     }
 
     public void postStop(){
-        System.out.println("Ticketseller removed");
+        System.out.println("Ticketbureau removed");
     }
 }

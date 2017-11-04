@@ -44,6 +44,9 @@ public class SeatManager extends AbstractActor {
                     System.out.println("Allright I'll remove the reservation");
                     cancelReservation(msg.getCustomer());
                 })
+                .matchAny(object ->{
+                    System.out.println("Wrong Message");
+                })
                 .build();
     }
 
@@ -59,10 +62,12 @@ public class SeatManager extends AbstractActor {
     }
 
     private void reserve(int n, ActorRef newOwner) {
-        for (int i = 0; i < n;i++){
+        for (int i = 0; i < n; i++){
             seats.get(i).setOwner(newOwner);
             takenseats.add(seats.get(i));
-            seats.remove(i);
+        }
+        for (int i = 0; i < n; i++){
+            seats.remove(0);
         }
     }
 

@@ -25,7 +25,7 @@ public class Customer extends AbstractActor {
         return receiveBuilder()
                 .match(Available.class, msg -> {
                     Buy message = new Buy(section,numberofseats,getSelf());
-                    ticketseller.tell(message, getSelf());
+                    getSender().tell(message, getSelf());
                     System.out.println("I want to buy "+ numberofseats + " please.");
                 })
                 .match(NotAvailable.class, msg -> {
@@ -37,14 +37,16 @@ public class Customer extends AbstractActor {
                     if (i>8){
                         System.out.println("I don't want my tickets anymore");
                         Cancel cancel = new Cancel(section, numberofseats, getSelf());
-                        ticketseller.tell(cancel, getSelf());
+                        getSender().tell(cancel, getSelf());
                     }
                     section = random.nextInt(7)+1;
                     numberofseats = random.nextInt(4)+1;
                     Reserve message = new Reserve(section,numberofseats,getSelf());
-                    ticketseller.tell(message, getSelf());
+                    getSender().tell(message, getSelf());
                     System.out.println("I want "+ numberofseats + " tickets in section " + section + " please.");
-
+                })
+                .matchAny(object ->{
+                    System.out.println("Wrong Message");
                 })
                 .build();
     }
