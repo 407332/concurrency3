@@ -6,12 +6,13 @@ import messages.*;
 import java.util.ArrayList;
 
 public class SeatManager extends AbstractActor {
+    private int testseats = 40;
 
     private int section;
     private ArrayList<Seat> seats = new ArrayList<>();
     private ArrayList<Seat> takenseats = new ArrayList<>();
 
-    private SeatManager(int section){
+    private SeatManager(int section) {
         this.section = section;
     }
 
@@ -58,12 +59,11 @@ public class SeatManager extends AbstractActor {
 
 
     public void postStop() throws Exception {
-        System.out.println("Seatmanager "+ section+ " removed and has" + seats.size() + " left");
         printFreeSeats();
     }
 
     private void addSeats(){
-        for (int i=0; i < 40; i++){
+        for (int i=0; i < testseats; i++){
             Seat seat = new Seat(section,i+1);
             seats.add(seat);
         }
