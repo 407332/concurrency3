@@ -75,7 +75,7 @@ public class Customer extends AbstractActor {
         section = random.nextInt(testsection)+1;
         numberofseats = random.nextInt(4)+1;
         Reserve message = new Reserve(section,numberofseats,getSelf());
-        getSender().tell(message, getSelf());
+        ticketseller.tell(message, getSelf());
         System.out.println("I want "+ numberofseats + " tickets in section " + section + " please.");
     }
 }
