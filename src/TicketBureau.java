@@ -17,9 +17,8 @@ public class TicketBureau extends AbstractActor {
     private Router router;
 
     {
-        generateSeatmanagers();
         List<Routee> routees = new ArrayList<Routee>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 1; i++) {
             ActorRef temp = getContext().actorOf(Props.create(Ticketagent.class));
             getContext().watch(temp);
             routees.add(new ActorRefRoutee(temp));
@@ -49,6 +48,7 @@ public class TicketBureau extends AbstractActor {
     }
 
     public void preStart(){
+        generateSeatmanagers();
         System.out.println("Ticketbureau created");
     }
 

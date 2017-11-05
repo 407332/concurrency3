@@ -36,13 +36,16 @@ public class SeatManager extends AbstractActor {
                     }
                 })
                 .match(Buy.class, msg -> {
-                    System.out.println("Allright the seats are reserved");
+                    System.out.println("Allright the seats " + msg.getNumberofseats() + " in section " + msg.getSection() + " are reserved");
                     Reservation message = new Reservation(getReservation(msg.getCustomer()) ,msg.getCustomer());
                     getSender().tell(message, getSelf());
                 })
                 .match(Cancel.class, msg -> {
-                    System.out.println("Allright I'll remove the reservation");
-                    cancelReservation(msg.getCustomer());
+                    System.out.println("Allright I'll remove the reservation in section " + msg.getSection() + " of " + msg.getNumberofseats() + " seats");
+                    cancelReservation(msg.getCustomer(),msg.getNumberofseats());
+                })
+                .matchEquals("Print", s ->{
+                    printFreeSeats();
                 })
                 .matchAny(object ->{
                     System.out.println("Wrong Message");
@@ -52,6 +55,12 @@ public class SeatManager extends AbstractActor {
 
     public void preStart(){
         addSeats();
+    }
+
+
+
+    public void postStop() throws Exception {
+        System.out.println("Seatmanager "+ section+ " removed");
     }
 
     private void addSeats(){
@@ -82,15 +91,24 @@ public class SeatManager extends AbstractActor {
         return temp;
     }
 
-    private void cancelReservation(ActorRef owner){
-        for (int i = 0; i < takenseats.size(); i++){
-            if (takenseats.get(i).getOwner().equals(owner)){
-                takenseats.get(i).setOwner(null);
-                seats.add(takenseats.get(i));
-                takenseats.remove(i);
-                i--;
+    private void cancelReservation(ActorRef owner, int nmbrseats) {
+        int seatsremoved = 0;
+        for (int i = 0; i < takenseats.size(); i++) {
+            if (nmbrseats > seatsremoved) {
+                if (takenseats.get(i).getOwner().equals(owner)) {
+                    takenseats.get(i).setOwner(null);
+                    seats.add(takenseats.get(i));
+                    takenseats.remove(i);
+                    i--;
+                    seatsremoved++;
+                }
             }
         }
+        System.out.println(seatsremoved + " succesfully removed from section " + section);
+    }
+
+    public void printFreeSeats(){
+        System.out.println("Section " + section + " has " + seats.size() + " left");
     }
 }
 

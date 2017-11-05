@@ -34,11 +34,12 @@ public class Ticketagent extends AbstractActor {
                     ActorRef customer = msg.getCustomer();
                     NotAvailable message = new NotAvailable(customer);
                     customer.tell(message, getSelf());
+
                 })
                 .match(Buy.class, msg -> {
                     System.out.println("Allright you can pay here");
                     int i = random.nextInt(10)+1;
-                    if (i<12){
+                    if (i<8){
                         System.out.println("Succesfull Payment");
                         ActorRef seatManager = seatManagers.get(msg.getSection()-1);
                         seatManager.tell(msg, getSelf());

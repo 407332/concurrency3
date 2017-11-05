@@ -8,10 +8,13 @@ import java.util.ArrayList;
 
 public class Customer extends AbstractActor {
 
+    private int testsection = 7;
+
     private Random random = new Random();
-    private int section = random.nextInt(7)+1;
+    private int section = random.nextInt(testsection)+1;
     private int numberofseats = random.nextInt(4)+1;
     private ActorRef ticketseller;
+    private ArrayList<String> seats = new ArrayList<>();
 
     private Customer(ActorRef ticketseller){
         this.ticketseller = ticketseller;
@@ -30,20 +33,24 @@ public class Customer extends AbstractActor {
                 })
                 .match(NotAvailable.class, msg -> {
                     System.out.println("Owh well too bad.");
+                    order();
                 })
                 .match(Reservation.class, msg -> {
-                    System.out.println(msg.getSeats());
                     int i = random.nextInt(10)+1;
                     if (i>8){
                         System.out.println("I don't want my tickets anymore");
                         Cancel cancel = new Cancel(section, numberofseats, getSelf());
                         getSender().tell(cancel, getSelf());
+                    }else{
+                        System.out.println(msg.getSeats());
+                        String temp = "order"+ msg.getSeats();
+                        seats.add(temp);
                     }
-                    section = random.nextInt(7)+1;
-                    numberofseats = random.nextInt(4)+1;
-                    Reserve message = new Reserve(section,numberofseats,getSelf());
-                    getSender().tell(message, getSelf());
-                    System.out.println("I want "+ numberofseats + " tickets in section " + section + " please.");
+                    order();
+                })
+                .matchEquals("Failed", s ->{
+                    System.out.println("I swear I had credit");
+                    order();
                 })
                 .matchAny(object ->{
                     System.out.println("Wrong Message");
@@ -59,7 +66,16 @@ public class Customer extends AbstractActor {
     }
 
     public void postStop(){
+        System.out.println( getSelf()+ " owns " + seats);
         System.out.println("Customer removed");
     }
 
+
+    public void order(){
+        section = random.nextInt(testsection)+1;
+        numberofseats = random.nextInt(4)+1;
+        Reserve message = new Reserve(section,numberofseats,getSelf());
+        getSender().tell(message, getSelf());
+        System.out.println("I want "+ numberofseats + " tickets in section " + section + " please.");
+    }
 }
