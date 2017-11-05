@@ -26,9 +26,7 @@ public class Ticketagent extends AbstractActor {
 
                 })
                 .match(Available.class, msg -> {
-                    ActorRef customer = msg.getCustomer();
-                    Available message = new Available(customer);
-                    customer.tell(message, getSelf());
+                    msg.getCustomer().tell(msg, getSelf());
                 })
                 .match(NotAvailable.class, msg -> {
                     ActorRef customer = msg.getCustomer();
@@ -57,9 +55,8 @@ public class Ticketagent extends AbstractActor {
                 })
                 .match(Cancel.class, msg -> {
                     System.out.println("Allright we will cancel the tickets");
-                    Cancel cancel = new Cancel(msg.getSection(),msg.getNumberofseats(),msg.getCustomer());
                     ActorRef seatManager = seatManagers.get(msg.getSection()-1);
-                    seatManager.tell(cancel,getSelf());
+                    seatManager.tell(msg,getSelf());
                 })
                 .matchAny(object ->{
                     System.out.println("Wrong Message");

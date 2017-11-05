@@ -24,14 +24,12 @@ public class SeatManager extends AbstractActor {
                 .match(IsAvailable.class, msg -> {
                     if (seats.size() >= msg.getNumberofseats()){
                         System.out.println("I have available seats");
-                        ActorRef customer = msg.getCustomer();
-                        Available message = new Available(customer);
+                        Available message = new Available(msg.getCustomer());
                         getSender().tell(message, getSelf());
                         reserve(msg.getNumberofseats(), msg.getCustomer());
                     }else{
                         System.out.println("I don't have any space for you");
-                        ActorRef customer = msg.getCustomer();
-                        NotAvailable message = new NotAvailable(customer);
+                        NotAvailable message = new NotAvailable(msg.getCustomer());
                         getSender().tell(message, getSelf());
                     }
                 })
@@ -60,7 +58,8 @@ public class SeatManager extends AbstractActor {
 
 
     public void postStop() throws Exception {
-        System.out.println("Seatmanager "+ section+ " removed");
+        System.out.println("Seatmanager "+ section+ " removed and has" + seats.size() + " left");
+        printFreeSeats();
     }
 
     private void addSeats(){
