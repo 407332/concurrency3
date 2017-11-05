@@ -1,6 +1,5 @@
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import akka.actor.Props;
 import messages.*;
 
 import java.util.ArrayList;

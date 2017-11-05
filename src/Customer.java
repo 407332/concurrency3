@@ -60,7 +60,7 @@ public class Customer extends AbstractActor {
 
     public void preStart(){
         System.out.println("Customer created");
-        Reserve message = new Reserve(section,numberofseats,getSelf());
+        Reserve message = new Reserve(section,numberofseats);
         ticketseller.tell(message, getSelf());
         System.out.println("I want "+ numberofseats + " tickets in section " + section + " please.");
     }
@@ -74,7 +74,7 @@ public class Customer extends AbstractActor {
     public void order(){
         section = random.nextInt(testsection)+1;
         numberofseats = random.nextInt(4)+1;
-        Reserve message = new Reserve(section,numberofseats,getSelf());
+        Reserve message = new Reserve(section,numberofseats);
         ticketseller.tell(message, getSelf());
         System.out.println("I want "+ numberofseats + " tickets in section " + section + " please.");
     }
